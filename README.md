@@ -1,6 +1,6 @@
 # NAME
 
-App::TimeTracker::Command::Post2IRC - App::TimeTracker plugin for posting to IRC
+App::TimeTracker::Command::TellRemote - App::TimeTracker plugin for telling generic remotes
 
 # VERSION
 
@@ -23,11 +23,11 @@ The messages is transfered as a GET-Request like this:
 
 ## plugins
 
-add `Post2IRC` to your list of plugins
+add `TellRemote` to your list of plugins
 
-## post2irc
+## tell\_remote
 
-add a hash named `post2irc`, containing the following keys:
+add a hash named `tell_remote`, containing the following keys:
 
 ### host
 
@@ -48,15 +48,17 @@ none
 ## start, stop, continue
 
 After running the respective command, a message is sent to the
-webservice that will afterwards post the message to IRC.
+remote that could for example post the message to IRC.
 
 ### New Options
 
-#### --irc\_quiet
+#### --tell\_remote
 
-    ~/perl/Your-Project$ tracker start --irc_quiet
+Defaults to true, but you can use:
 
-Do not post this action to IRC.
+    ~/perl/Your-Secret-Project$ tracker start --no_tell_remote
+
+to **not** send a message
 
 # AUTHOR
 
