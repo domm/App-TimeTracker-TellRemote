@@ -1,10 +1,10 @@
-package App::TimeTracker::Command::Post2IRC;
+package App::TimeTracker::Command::TellRemote;
 use strict;
 use warnings;
 use 5.010;
 
 our $VERSION = "3.000";
-# ABSTRACT: App::TimeTracker plugin for posting to IRC
+# ABSTRACT: App::TimeTracker plugin for telling generic remotes
 
 use Moose::Role;
 use LWP::UserAgent;
@@ -13,11 +13,11 @@ use URI::Escape;
 use App::TimeTracker::Utils qw(error_message);
 use Encode;
 
-has 'irc_quiet' => (
+has 'tell_remote' => (
     is            => 'ro',
     isa           => 'Bool',
-    documentation => 'IRC: Do not post to IRC',
-    cmd_aliases   => [qw/ircquiet/],
+    default       => 1,
+    documentation => 'TellRemote: tell generic remote',
     traits        => ['Getopt'],
 );
 
@@ -25,7 +25,7 @@ after [ 'cmd_start', 'cmd_continue' ] => sub {
     my $self = shift;
     return if $self->irc_quiet;
     my $task = $self->_current_task;
-    $self->_post_to_irc( start => $task );
+    $self->_tell_remote( start => $task );
 };
 
 after 'cmd_stop' => sub {
@@ -33,12 +33,12 @@ after 'cmd_stop' => sub {
     return if $self->irc_quiet;
     return unless $self->_current_command eq 'cmd_stop';
     my $task = App::TimeTracker::Data::Task->previous( $self->home );
-    $self->_post_to_irc( stop => $task );
+    $self->_tell_remote( stop => $task );
 };
 
-sub _post_to_irc {
+sub _tell_remote {
     my ( $self, $status, $task ) = @_;
-    my $cfg = $self->config->{post2irc};
+    my $cfg = $self->config->{tell_remote};
     return unless $cfg;
 
     my $ua = LWP::UserAgent->new( timeout => 3 );
@@ -59,7 +59,7 @@ sub _post_to_irc {
         . $token;
     my $res = $ua->get($url);
     unless ( $res->is_success ) {
-        error_message( 'Could not post to IRC status via %s: %s',
+        error_message( 'Could not post to remote status via %s: %s',
             $url, $res->status_line );
     }
 }
@@ -86,11 +86,11 @@ The messages is transfered as a GET-Request like this:
 
 =head2 plugins
 
-add C<Post2IRC> to your list of plugins
+add C<TellRemote> to your list of plugins
 
-=head2 post2irc
+=head2 tell_remote
 
-add a hash named C<post2irc>, containing the following keys:
+add a hash named C<tell_remote>, containing the following keys:
 
 =head3 host
 
@@ -111,14 +111,16 @@ none
 =head2 start, stop, continue
 
 After running the respective command, a message is sent to the
-webservice that will afterwards post the message to IRC.
+remote that could for example post the message to IRC.
 
 =head3 New Options
 
-=head4 --irc_quiet
+=head4 --tell_remote
 
-    ~/perl/Your-Project$ tracker start --irc_quiet
+Defaults to true, but you can use:
 
-Do not post this action to IRC.
+    ~/perl/Your-Secret-Project$ tracker start --no_tell_remote
+
+to B<not> send a message
 
 
