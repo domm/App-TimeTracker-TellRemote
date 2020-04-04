@@ -23,14 +23,14 @@ has 'tell_remote' => (
 
 after [ 'cmd_start', 'cmd_continue' ] => sub {
     my $self = shift;
-    return if $self->irc_quiet;
+    return unless $self->tell_remote;
     my $task = $self->_current_task;
     $self->_tell_remote( start => $task );
 };
 
 after 'cmd_stop' => sub {
     my $self = shift;
-    return if $self->irc_quiet;
+    return unless $self->tell_remote;
     return unless $self->_current_command eq 'cmd_stop';
     my $task = App::TimeTracker::Data::Task->previous( $self->home );
     $self->_tell_remote( stop => $task );
