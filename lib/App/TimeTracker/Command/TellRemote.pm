@@ -49,14 +49,11 @@ sub _tell_remote {
         . $task->say_project_tags;
     # Use bytes for creating the digest, otherwise we'll get into trouble
     # https://rt.cpan.org/Public/Bug/Display.html?id=93139
-    my $token = sha1_hex( encode_utf8($message), $cfg->{secret} );
+    my $token = sha1_hex( encode_utf8($message), $cfg->{secret} ) if $cfg->{secret} ;
 
-    my $url
-        = $cfg->{host}
-        . '?message='
-        . uri_escape_utf8($message)
-        . '&token='
-        . $token;
+    my $url = $cfg->{url} . '?message=' . uri_escape_utf8($message);
+    $url .= '&token='. $token if $cfg->{secret};
+
     my $res = $ua->get($url);
     unless ( $res->is_success ) {
         error_message( 'Could not post to remote status via %s: %s',
