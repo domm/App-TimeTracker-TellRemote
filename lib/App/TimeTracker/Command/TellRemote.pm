@@ -3,7 +3,7 @@ use strict;
 use warnings;
 use 5.010;
 
-our $VERSION = "3.000";
+our $VERSION = "3.001";
 # ABSTRACT: App::TimeTracker plugin for telling generic remotes
 
 use Moose::Role;
@@ -68,12 +68,11 @@ __END__
 
 =head1 DESCRIPTION
 
-We use an internal IRC channel for internal communication. And we all want (need) to know what other team members are currently doing. This plugin helps us making sharing this information easy.
+We use an internal IRC channel for internal communication. And we all want (need) to know what other team members are currently doing. This plugin helps us making sharing this information easy. B<Update:> We moved to a L<matrix|https://matrix.org> chat, and this plugin still works..
 
-After running some commands, this plugin prepares a short message and
-sends it (together with an authentification token) to a small
-webserver-cum-irc-bot (C<Bot::FromHTTP>, not yet on CPAN, but basically
-just a slightly customized/enhanced pastebin).
+After running some commands, this plugin prepares a short message and sends it (together with an authentification token) to a small webserver-cum-irc-bot (C<Bot::FromHTTP>, not yet on CPAN, but basically just a slightly customized/enhanced pastebin).
+
+In fact, you can post the message to any Webhook, eg C<Net::Matrix::Webhook>
 
 The messages is transfered as a GET-Request like this:
 
@@ -89,15 +88,17 @@ add C<TellRemote> to your list of plugins
 
 add a hash named C<tell_remote>, containing the following keys:
 
-=head3 host
+=head3 url
 
-The hostname of the server C<Bot::FromHTTP> is running on. Might also contain a special port number (C<http://ircbox.vpn.yourcompany.com:9090>)
+The URL where the webhook is running. Might also contain a special port number (C<http://ircbox.vpn.yourcompany.com:9090>)
 
 =head3 secret
 
-A shared secret used to calculate the authentification token. The token is calculated like this:
+An optional shared secret used to calculate the authentification token. The token is calculated like this:
 
   my $token = Digest::SHA::sha1_hex($message, $secret);
+
+If no secret is used, no token added to the request to the webhook
 
 =head1 NEW COMMANDS
 
