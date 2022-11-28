@@ -74,7 +74,7 @@ After running some commands, this plugin prepares a short message and sends it (
 
 In fact, you can post the message to any Webhook, eg C<Net::Matrix::Webhook>
 
-The messages is transfered as a GET-Request like this:
+The message is transferred as a GET-Request like this:
 
   http://yourserver/?message=some message&token=a58875d576e8c09a...
 
